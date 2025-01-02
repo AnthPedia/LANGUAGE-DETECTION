@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from sklearn import feature_extraction, pipeline
 from sklearn.linear_model import LogisticRegression
 from flask_cors import CORS
+from nltk.tokenize import word_tokenize
 import pandas as pd
 import string
 
@@ -10,12 +11,19 @@ CORS(app)
 
 df = pd.read_csv('./Dataset/Language Detection.csv')
 punctuation_list = string.punctuation
-def remove_punctuation(text):
-    for pun in punctuation_list:
-        text = text.replace(pun, "")
-    return text.lower()
 
-df['Text'] = df['Text'].apply(remove_punctuation)
+def preprocess_text(text, lang="english"):
+    
+    words = word_tokenize(text)
+    
+    words = [word for word in words if word not in string.punctuation]
+
+    words = [word for word in words if word.isalpha()]
+    
+    preprocessed_text = ' '.join(words)
+    return preprocessed_text
+
+df['Text'] = df['Text'].apply(preprocess_text)
 
 text = df['Text']
 language = df['Language']
