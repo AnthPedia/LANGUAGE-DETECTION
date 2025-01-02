@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from sklearn import feature_extraction, pipeline
-from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.feature_extraction.text import TfidfVectorizer
 from flask_cors import CORS
 from nltk.tokenize import word_tokenize
 import pandas as pd
@@ -27,8 +28,8 @@ df['Text'] = df['Text'].apply(preprocess_text)
 
 text = df['Text']
 language = df['Language']
-tfidf = feature_extraction.text.TfidfVectorizer(ngram_range=(2, 3), analyzer='char')
-model_pipe = pipeline.Pipeline([('tfidf', tfidf), ('clf', LogisticRegression(max_iter=1000))])
+tfidf = TfidfVectorizer(ngram_range=(2, 3), analyzer='char')
+model_pipe = pipeline.Pipeline([('tfidf', tfidf), ('clf', SVC())])
 model_pipe.fit(text, language)
 
 @app.route('/predict', methods=['POST'])
